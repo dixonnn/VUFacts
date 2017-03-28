@@ -84,6 +84,12 @@ public class ShakeHome extends AppCompatActivity implements
                 count++;
             }
 
+            System.out.println(" " + buildingList.get(0));
+            System.out.println(" " + buildingList.get(1));
+            System.out.println(" " + buildingList.get(2));
+            System.out.println(" " + buildingList.get(3));
+
+
         } catch (JSONException j) {
             System.out.println("JSON Exception occurred...");
         }

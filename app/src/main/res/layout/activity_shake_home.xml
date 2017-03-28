@@ -12,25 +12,16 @@
     tools:context="com.example.wildcat.vufacts.ShakeHome">
 
     <TextView
-        android:id="@+id/buildingName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/desc"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="45dp"
-        android:textSize="24sp" />
-
-    <TextView
-        android:text="Shake Me"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/shakeMe"
-        android:textSize="30sp"
-        android:textColor="@color/colorPrimary"
-        android:textStyle="normal|bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="14dp" />
+        android:layout_marginTop="14dp"
+        android:text="Shake Me"
+        android:textColor="@color/colorPrimary"
+        android:textSize="30sp"
+        android:textStyle="normal|bold" />
 
     <TextView
         android:id="@+id/desc"
@@ -38,19 +29,31 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/shakeMe"
         android:layout_centerHorizontal="true"
-        android:text="For a Villanova Building Fact" />
+        android:text="For a Villanova Building Fact"
+        android:textAlignment="center" />
 
     <TextView
-        android:id="@+id/factText"
+        android:id="@+id/youAre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/buildingName"
+        android:layout_below="@+id/desc"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:layout_weight="1"
-        android:ellipsize="none"
-        android:maxLines="100"
-        android:scrollHorizontally="false"/>
+        android:layout_marginTop="25dp"
+        android:text="You are close to"
+        android:textAlignment="center"
+        android:textColor="?android:attr/colorMultiSelectHighlight"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/buildingName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/youAre"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -58,7 +61,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="19dp"
+        android:layout_marginBottom="20dp"
         app:srcCompat="@color/cast_intro_overlay_button_background_color" />
+
+    <TextView
+        android:id="@+id/fact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buildingName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_weight="1"
+        android:ellipsize="none"
+        android:maxLines="100"
+        android:scrollHorizontally="false"/>
 
 </RelativeLayout>

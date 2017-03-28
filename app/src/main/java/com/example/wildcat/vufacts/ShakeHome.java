@@ -4,15 +4,18 @@ import android.content.pm.PackageManager;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.vision.text.Text;
 import com.squareup.seismic.ShakeDetector;
 
 import org.json.JSONArray;
@@ -22,26 +25,37 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-
-//import com.example.wildcat.vufacts.Building;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ShakeHome extends AppCompatActivity implements
         ShakeDetector.Listener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    // Variables for getting current location
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    public double currentLatitude, currentLongitude;
     private int REQUEST_LOCATION = 1;
+
+    final public ArrayList<Building> buildingList = new ArrayList<Building>();
+    final public Location currentLocation = new Location("");
+
+    /*
+    * >>>> onCreate
+    *
+    * Set TextView invisible, only should show once nearby building is recognized.
+    * Prepare Google Play Services for finding current location.
+    * Prepare shake listener.
+    * Load all buildings and their locations into an ArrayList for access once shaken. */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shake_home);
 
-        // Image of building to display only after coordinates gathered
-        ImageView image = (ImageView) findViewById(R.id.imageView);
+        // Set youAre TextView to invisible
+        TextView youAre = (TextView) findViewById(R.id.youAre);
+        youAre.setVisibility(View.INVISIBLE);
 
         // prep google play services
         if (mGoogleApiClient == null) {
@@ -57,11 +71,10 @@ public class ShakeHome extends AppCompatActivity implements
         ShakeDetector sd = new ShakeDetector(this);
         sd.start(sensorManager);
 
-        // prep building locations
+        // load buildings and locations
         int count = 0;
         String building, latitude, longitude;
         double latCast, longCast;
-        ArrayList<Building> buildingList = new ArrayList<Building>();
 
         try {
             JSONArray jArray = new JSONArray(loadJSON("buildings.json"));
@@ -75,7 +88,10 @@ public class ShakeHome extends AppCompatActivity implements
                 try {
                     latCast = Double.parseDouble(latitude);
                     longCast = Double.parseDouble(longitude);
-                    buildingList.add(new Building(building, latCast, longCast));
+                    currentLocation.setLatitude(latCast);
+                    currentLocation.setLongitude(longCast);
+
+                    buildingList.add(new Building(building, currentLocation));
 
                 } catch (NumberFormatException e) {
                     System.out.println("Number format exception occurred...");
@@ -84,21 +100,93 @@ public class ShakeHome extends AppCompatActivity implements
                 count++;
             }
 
-            System.out.println(" " + buildingList.get(0));
-            System.out.println(" " + buildingList.get(1));
-            System.out.println(" " + buildingList.get(2));
-            System.out.println(" " + buildingList.get(3));
-
-
         } catch (JSONException j) {
             System.out.println("JSON Exception occurred...");
         }
-
     }
+
+
+    /*
+    * >>>> hearShake
+    *
+    * Recognizes a shake of the device, notifies user with toast.
+    * Connects to Google API Client.                             */
 
     public void hearShake() {
         Toast.makeText(this, "Shook!", Toast.LENGTH_SHORT).show();
         mGoogleApiClient.connect();
+    }
+
+
+    /*
+    * >>>> getFact
+    *
+    * Calculate the distance between current location and each building.
+    * If any are within 100 yards, add that building to a list.
+    * Choose a building name from that list randomly.
+    * Import facts.json, create new JSON Array of only facts about nearby building.
+    * Choose random fact from that new array.
+    * Set layout objects to proper string/image values                             */
+
+    public void getFact(Location curLoc) {
+
+        ImageView image = (ImageView) findViewById(R.id.imageView);
+        TextView youAre = (TextView) findViewById(R.id.youAre);
+        TextView buildingName = (TextView) findViewById(R.id.buildingName);
+        TextView fact = (TextView) findViewById(R.id.fact);
+
+        // Declare Variables
+        int ct1, ct2;
+        float distance;
+        ArrayList<String> nearNames = new ArrayList<>();
+        String nearbyBuilding, buildingFact;
+
+        // Calculate distance between current location and each building.
+        // If dist <= 50, add the building's name to a list of Strings.
+        for(ct1 = 0; ct1 < buildingList.size(); ct1++) {
+            distance = curLoc.distanceTo(buildingList.get(ct1).loc);
+            if(distance <= 50) nearNames.add(buildingList.get(ct1).name);
+        }
+
+        // If there is more than 1 name in the list, randomly pick one.
+        // If there is only 1, set the string to that building's name.
+        // If there are 0, throw toast, "None in range."
+        if(nearNames.size() > 1) {
+            int randBuilding = ThreadLocalRandom.current().nextInt(0, nearNames.size() + 1);
+            nearbyBuilding = nearNames.get(randBuilding);
+        } else if(nearNames.size() == 1){
+            nearbyBuilding = nearNames.get(0);
+        } else {
+            Toast.makeText(this, "No valid buildings nearby!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            JSONArray allFacts = new JSONArray(loadJSON("facts.json"));
+            JSONArray relFacts = new JSONArray();
+
+            // Parse through all facts, hold on to only those with tag_Building == nearbyBuilding
+            for(ct2 = 0; ct2 < allFacts.length(); ct2++) {
+                if(allFacts.getJSONObject(ct2).getString("Building").equals(nearbyBuilding)) {
+                    relFacts.put(allFacts.getJSONObject(ct2));
+                }
+            }
+
+            // Randomly pick fact from relevant facts
+            int randFact = ThreadLocalRandom.current().nextInt(0, relFacts.length() + 1);
+            buildingFact = relFacts.getJSONObject(randFact).getString("Fact");
+
+            // Make youAre visible, set building name, fact, and image
+            youAre.setVisibility(View.VISIBLE);
+            buildingName.setText(nearbyBuilding);
+            fact.setText(buildingFact);
+            //image.setImageDrawable(
+                    //ResourcesCompat.getDrawable(getResources(), R.drawable.myImage, null));
+
+        } catch (JSONException j) {
+            System.out.println("JSON EXCEPTION: " + j);
+        }
+
     }
 
     @Override
@@ -116,15 +204,11 @@ public class ShakeHome extends AppCompatActivity implements
             // Permission has already been granted, we're good to go
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
+            // If a location was properly found, send lat + long to fact fetching method
             if (mLastLocation != null) {
-                TextView building = (TextView) findViewById(R.id.buildingName);
-                TextView fact = (TextView) findViewById(R.id.factText);
+                getFact(mLastLocation);
 
-                currentLatitude = mLastLocation.getLatitude();
-                currentLongitude = mLastLocation.getLongitude();
-
-
-
+            // If no location was detected, send toast
             } else {
                 Toast.makeText(this, "No location detected.", Toast.LENGTH_SHORT).show();
             }

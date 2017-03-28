@@ -1,5 +1,7 @@
 package com.example.wildcat.vufacts;
 
+import android.location.Location;
+
 /**
  * Created by wildcat on 3/21/2017.
  */
@@ -8,15 +10,13 @@ public class Building {
 
     // Building name, latitude, and longitude
     public String name;
-    public double lat;
-    public double lon;
+    public Location loc;
 
     // Class constructor
-    public Building (String name, double lat, double lon) {
+    public Building (String name, Location loc) {
 
         this.name = name;
-        this.lat = lat;
-        this.lon = lon;
+        this.loc = loc;
 
     }
 
@@ -25,11 +25,5 @@ public class Building {
         return name;
     }
 
-    public double getLat() {
-        return lat;
-    }
-
-    public double getLong() {
-        return lon;
-    }
+    public Location getLocation() {return loc; }
 }

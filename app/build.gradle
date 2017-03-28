@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.example.wildcat.vufacts"
-        minSdkVersion 15
+        minSdkVersion 21
         targetSdkVersion 25
         multiDexEnabled true
         versionCode 1
@@ -21,7 +21,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:multidex:1.0.1'
     compile files('libs/seismic-1.0.2.jar')
     compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.google.android.gms:play-services:10.2.0'

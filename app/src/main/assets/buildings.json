@@ -18,5 +18,10 @@
    "Building": "Falvey",
    "Latitude": 40.037469,
    "Longitude": -75.342546
+ },
+ {
+   "Building": "My House",
+   "Latitude": 40.030383,
+   "Longitude": -75.361668
  }
 ]

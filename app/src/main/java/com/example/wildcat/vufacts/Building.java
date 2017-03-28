@@ -9,8 +9,8 @@ import android.location.Location;
 public class Building {
 
     // Building name, latitude, and longitude
-    public String name;
-    public Location loc;
+    private String name;
+    private Location loc;
 
     // Class constructor
     public Building (String name, Location loc) {

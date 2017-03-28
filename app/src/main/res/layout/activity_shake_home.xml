@@ -55,15 +55,6 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        app:srcCompat="@color/cast_intro_overlay_button_background_color" />
-
     <TextView
         android:id="@+id/fact"
         android:layout_width="wrap_content"
@@ -74,6 +65,7 @@
         android:layout_weight="1"
         android:ellipsize="none"
         android:maxLines="100"
-        android:scrollHorizontally="false"/>
+        android:scrollHorizontally="false"
+        android:textAlignment="center" />
 
 </RelativeLayout>
